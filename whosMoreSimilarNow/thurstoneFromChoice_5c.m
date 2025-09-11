@@ -28,6 +28,7 @@ analysisList = {...
 load pantoneColors pantone;
 figureFlag = false;
 CIbounds = [2.5 97.5];
+pi = 3.1415;
 
 % loop over data
 for dataIdx = 1:numel(dataList)
@@ -50,6 +51,12 @@ for dataIdx = 1:numel(dataList)
          dataName = 'tomicBays';
          load([dataDir dataName], 'ds');
 
+
+         % ds.a = mod(ds.a, pi);
+         % ds.b = mod(ds.b, pi);
+         % ds.c = mod(ds.c, pi);
+         % ds.d = mod(ds.d, pi);
+         % 
          a = ds.aIdx;
          b = ds.bIdx;
          c = ds.cIdx;
@@ -58,7 +65,7 @@ for dataIdx = 1:numel(dataList)
          nTrials = ds.nTrials;
          nStimuli = ds.nStimuli;
 
-         muTruth = ds.stimuli;
+         muTruth = mod(ds.stimuli, 2*pi);
          sigmaTruth = 0.01;
 
          axisScale = 2;
@@ -98,7 +105,7 @@ for dataIdx = 1:numel(dataList)
 
    % MCMC properties
    nChains    = 8;     % number of MCMC chains
-   nBurnin    = 1e0;   % number of discarded burn-in samples
+   nBurnin    = 1e2;   % number of discarded burn-in samples
    nSamples   = 1e2;   % number of collected samples
    nThin      = 1;     % number of samples between those collected
    doParallel = 1;     % whether MATLAB parallel toolbox parallizes chains
