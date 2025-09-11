@@ -6,12 +6,12 @@
 % generate data then look at inference
 
 clear; close all;
-preLoad = true;
-printFigures = true;
+preLoad = false;
+printFigures = false;
 
 % graphical model script
 modelDir = './';
-modelName = 'thurstoneFromChoice_5c';
+modelName = 'thurstoneFromChoice_5d';
 
 
 dataList = {...
@@ -105,10 +105,17 @@ for dataIdx = 1:numel(dataList)
 
    % MCMC properties
    nChains    = 8;     % number of MCMC chains
-   nBurnin    = 1e2;   % number of discarded burn-in samples
-   nSamples   = 1e2;   % number of collected samples
+   nBurnin    = 1e3;   % number of discarded burn-in samples
+   nSamples   = 1e3;   % number of collected samples
    nThin      = 1;     % number of samples between those collected
    doParallel = 1;     % whether MATLAB parallel toolbox parallizes chains
+
+   %    % MCMC properties
+   % nChains    = 8;     % number of MCMC chains
+   % nBurnin    = 1e2;   % number of discarded burn-in samples
+   % nSamples   = 1e2;   % number of collected samples
+   % nThin      = 1;     % number of samples between those collected
+   % doParallel = 1;     % whether MATLAB parallel toolbox parallizes chains
 
    % assign MATLAB variables to the observed nodes
    data = struct(...
@@ -132,8 +139,8 @@ for dataIdx = 1:numel(dataList)
    end
 
    % generator for initialization
-   generator = @()struct('xA', xAinit, 'xB', xBinit, ...
-      'xC', xCinit, 'xD', xDinit);
+   generator = @()struct('xAtmp1', xAinit, 'xBtmp1', xBinit, ...
+      'xCtmp1', xCinit, 'xDtmp1', xDinit);
 
    fileName = sprintf('%s_%s_%s.mat', modelName, dataName, engine);
 
@@ -221,11 +228,11 @@ for dataIdx = 1:numel(dataList)
 
             xLim = [floor(min(mu)) ceil(max(mu))];
             set(gca, ...
-               'xlim'       , [0 2*pi]    , ...
-               'xtick'      , [0 pi 2*pi]   , ...
+               'xlim'       , [0 pi]    , ...
+               'xtick'      , [0 pi/2 pi]   , ...
                'xticklabelrot', 0, ...
-               'ylim'       , [0 2*pi]    , ...
-               'ytick'      , [0 pi 2*pi]  , ...
+               'ylim'       , [0 pi]    , ...
+               'ytick'      , [0 pi/ 2 pi]  , ...
                'box'        , 'off'     , ...
                'tickdir'    , 'out'     , ...
                'layer'      , 'top'     , ...
