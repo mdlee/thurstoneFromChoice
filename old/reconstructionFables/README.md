@@ -1,6 +1,8 @@
-JAGS graphical models for a perceptual and cognitive reconstructions tasks for stimuli varying in orientation.
+JAGS graphical models for a perceptual and memory reconstructions tasks for stimuli varying in orientation.
 
-On each trial, two pairs of stimuli are presented. The response is a binary decision about which of the two pairs has more similar stimuli.
+In the perceptual task, on each trial, a stimulus is presented, and the participant uses an interface to reconstruct it.
+
+In the memory task, 3 or 6 stimuli are presented then removed, and then one of them is revealed to be the targer. The participant uses an interface to reconstruct the target.
 
 # Version 7
 
