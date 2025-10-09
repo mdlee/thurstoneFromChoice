@@ -21,9 +21,9 @@ for dataIdx = 1:numel(dataList)
    dataName = dataList{dataIdx};
    switch dataName
 
-      case 'tomicBays'
+      case 'tomicBaysSimilarity'
          dataDir = 'data/';
-         dataName = 'tomicBaysSimilarity';
+         dataName = 'tomicBays';
          load([dataDir dataName], 'ds');
 
          a = ds.aIdx;
@@ -45,7 +45,7 @@ for dataIdx = 1:numel(dataList)
    nSamples   = 2e3;   % number of collected samples
    nThin      = 10;    % number of samples between those collected
    doParallel = 1;     % whether MATLAB parallel toolbox parallizes chains
-   
+
    % assign MATLAB variables to the observed nodes
    data = struct(...
       'a'        , a        , ...
@@ -68,7 +68,7 @@ for dataIdx = 1:numel(dataList)
    end
 
    % generator for initialization
-   % (note intialization of mu, which encourages the 
+   % (note intialization of mu, which encourages the
    % better log-likelihood representation)
    generator = @()struct(...
       'xA', xAinit, ...
@@ -104,6 +104,13 @@ for dataIdx = 1:numel(dataList)
          'parallel'        , doParallel                                );
       fprintf('%s took %f seconds!\n', upper(engine), toc); % show timing
 
+      % just convergent enough chains
+      [keepChains, rHat] = findKeepChains(chains.sigma, 2, 1.1);
+      fields = fieldnames(chains);
+      for i = 1:numel(fields)
+         chains.(fields{i}) = chains.(fields{i})(:, keepChains);
+      end
+
       % convergence of each parameter
       disp('Convergence statistics:')
       grtable(chains, 1.05)
@@ -119,6 +126,7 @@ for dataIdx = 1:numel(dataList)
       save(sprintf('storage/%s', fileName), 'chains', 'stats', 'diagnostics', 'info', '-v7.3');
 
    end
+
 
    % log likelihood
    if contains(params, 'yp')

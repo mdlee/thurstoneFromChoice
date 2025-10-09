@@ -1,0 +1,184 @@
+% figures and non-modeling analyses for tomic and bays data
+
+clear;
+close all;
+
+printFigures = true;
+
+analysisList = {...
+   'fourScatter'; ...
+   'twoRepresentations'; ...
+   };
+
+
+% load data
+dataDir = 'data/';
+dataName = 'tomicBays';
+load([dataDir dataName], 'ds', 'dp', 'dm');
+
+% constants
+load pantoneColors pantone;
+pi = 3.1415;
+
+% loops over analyses
+for analysisIdx = 1:numel(analysisList)
+   analysisName = analysisList{analysisIdx};
+
+   switch analysisName
+      case 'fourScatter'
+
+         % may need to add directory structure to find these stored files
+         fileList = {...
+            'similarityComparison_tomicBays_jags'; ...
+            'perceptualReproduction_tomicBays_jags'; ...
+            'memoryReproductionNoSwap_tomicBays_jags'; ...
+            'memoryReproduction_tomicBays_jags'};
+         fontSize = 20;
+         CIbounds = [2.5 97.5];
+
+         nModels = numel(fileList);
+         [nRows, nCols] = subplotArrange(nModels);
+
+         F = figure; clf; hold on;
+         setFigure(F, [0.2 0.2 0.6 0.7], '');
+
+         for modelIdx = 1:nModels
+            fileName = fileList{modelIdx};
+
+            fprintf('Loading pre-stored samples from file %s\n', fileName);
+            load(sprintf('storage/%s', fileName), 'chains', 'stats', 'diagnostics', 'info');
+
+            mu = codatable(chains, 'mu', @mean);
+            muBounds = nan(ds.nStimuli, 2);
+            for idx = 1:ds.nStimuli
+               muBounds(idx, :) = prctile(chains.(sprintf('mu_%d', idx))(:), CIbounds);
+            end
+            muTruth = ds.stimuli;
+
+            subplot(nRows, nCols, modelIdx); cla; hold on;
+            set(gca, ...
+               'xlim'       , [0 pi]    , ...
+               'xtick'      , [0 pi/4 pi/2 3*pi/4 pi]   , ...
+               'xticklabelrot', 0, ...
+               'xticklabel' , {'$0$', '$\frac{\pi}{4}$', '$\frac{\pi}{2}$', '$\frac{3\pi}{4}$', '$\pi$'}, ...
+               'ylim'       , [0 pi]    , ...
+               'ytick'      , [0 pi/4 pi/2 3*pi/4 pi]   , ...
+               'yticklabel' , {'$0$', '$\frac{\pi}{4}$', '$\frac{\pi}{2}$', '$\frac{3\pi}{4}$', '$\pi$'}, ...
+               'ticklabelinterpreter', 'latex', ...
+               'box'        , 'off'     , ...
+               'tickdir'    , 'out'     , ...
+               'layer'      , 'top'     , ...
+               'ticklength' , [0.02 0]  , ...
+               'layer'      , 'top'     , ...
+               'clipping'   , 'off'     , ...
+               'fontsize'   , fontSize  );
+            axis square;
+            if modelIdx == (nModels - nCols + 1)
+               xlabel('Psychological', 'fontsize', fontSize);
+               ylabel('Physical', 'fontsize', fontSize);
+            end
+            text(-1, 3.5, lower(char(64+modelIdx)), 'fontsize', fontSize, 'fontweight', 'bold');
+            moveAxis(gca, [1 1 0.95 0.95], [0 0.025 0 0]);
+            Raxes(gca, 0.02, 0.01);
+
+            for i = pi/4:pi/4:3*pi/4
+               plot([i i], [0 pi], '-', ...
+                  'color', pantone.GlacierGray);
+               plot([0 pi], [i i], '-', ...
+                  'color', pantone.GlacierGray);
+            end
+
+            for idx = 1:ds.nStimuli
+               plot(muBounds(idx, :), muTruth(idx)*ones(1, 2), '-', ...
+                  'color', pantone.ClassicBlue, ...
+                  'linewidth', 1);
+               plot(mu(idx), muTruth(idx), 'o', ...
+                  'markerfacecolor', pantone.ClassicBlue, ...
+                  'markeredgecolor', 'w', ...
+                  'linewidth', 0.5, ...
+                  'markersize', 4);
+
+            end
+            plot([0 pi], [0 pi], '-', ...
+               'color', pantone.AuroraRed, 'linewidth', 0.5);
+         end
+
+      case 'twoRepresentations'
+
+         % may need to add directory structure to find these stored files
+         fileList = {...
+            'similarityComparison_tomicBays_jags'; ...
+            'perceptualReproduction_tomicBays_jags'};
+
+         fontSize = 20;
+         CIbounds = [2.5 97.5];
+
+         nModels = numel(fileList);
+         [nRows, nCols] = subplotArrange(nModels);
+
+         F = figure; clf; hold on;
+         setFigure(F, [0.2 0.2 0.6 0.4], '');
+
+         for modelIdx = 1:nModels
+            fileName = fileList{modelIdx};
+
+            fprintf('Loading pre-stored samples from file %s\n', fileName);
+            load(sprintf('storage/%s', fileName), 'chains', 'stats', 'diagnostics', 'info');
+
+            mu = codatable(chains, 'mu', @mean);
+            muTruth = ds.stimuli;
+
+            xLim = [-1 1];
+            subplot(nRows, nCols, modelIdx); cla; hold on;
+            set(gca, ...
+               'xlim'       , xLim    , ...
+               'xtick'      , []   , ...
+               'xticklabelrot', 0, ...
+               'ylim'       , xLim    , ...
+               'ytick'      , []  , ...
+               'box'        , 'off'     , ...
+               'tickdir'    , 'out'     , ...
+               'layer'      , 'top'     , ...
+               'ticklength' , [0.01 0]  , ...
+               'layer'      , 'top'     , ...
+               'clipping'   , 'off'     , ...
+               'fontsize'   , fontSize  );
+            moveAxis(gca, [1 1 0.9 1], [0 0 0 0]);
+            axis square;
+            axis off
+            text(-1.15, 1.185, lower(char(64+modelIdx)), ...
+               'fontsize', fontSize, 'fontweight', 'bold');
+
+            r = [1.05 1.15];
+            plot(xLim, [0 0], '-', ...
+               'color', pantone.GlacierGray);
+            plot(0, 0, 'o', ...
+               'markerfacecolor', pantone.GlacierGray, ...
+               'markeredgecolor', 'w', ...
+               'markersize', 4);
+
+            for idx = 1:ds.nStimuli
+               plot([cos(muTruth(idx)) r(1)*cos(mu(idx))], [sin(muTruth(idx)) r(1)*sin(mu(idx))], '-', ...
+                  'color', pantone.Titanium);
+               plot(cos(muTruth(idx)), sin(muTruth(idx)), 'o', ...
+                  'markerfacecolor',  'w', ...
+                  'markeredgecolor', 'k', ...
+                  'markersize', 5);
+               plot(r*cos(mu(idx)), r*sin(mu(idx)), 'k-', ...
+                  'linewidth', 2);
+            end
+         end
+
+    
+   end
+
+   % print
+   if printFigures
+      if ~isfolder('figures')
+         !mkdir figures
+      end
+      print(sprintf('figures/%s.png', analysisName), '-dpng');
+      print(sprintf('figures/%s.eps', analysisName), '-depsc');
+   end
+
+end
