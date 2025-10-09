@@ -1,4 +1,4 @@
-# choice probabilities for perceptual reproduction task
+# choice probabilities for memory reproduction task
 # c different weights for different set sizes
 data{
   pi = 3.1415
