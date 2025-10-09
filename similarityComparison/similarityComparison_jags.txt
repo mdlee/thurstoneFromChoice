@@ -11,6 +11,7 @@ model{
   }
   # sampling noise 
   sigma ~ dunif(0, pi)
+  # experimental trials
   for (t in 1:nTrials){
     # mental samples
     xA[t] ~ dnorm(mu[a[t]], 1/sigma^2)

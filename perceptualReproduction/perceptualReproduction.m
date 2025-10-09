@@ -1,16 +1,17 @@
-%% Similarity compatison model
+%% Perceptual reproduction model
 
 clear; close all;
 preLoad = true;
 
 % graphical model script
 modelDir = './';
-modelName = 'similarityComparison';
+modelName = 'perceptualReproduction';
 engine = 'jags';
+% engine = 'stan';
 
 % data sets
 dataList = {...
-   'tomicBaysSimilarity'; ...
+   'tomicBaysPerception'; ...
    };
 
 %% general constants
@@ -21,18 +22,15 @@ for dataIdx = 1:numel(dataList)
    dataName = dataList{dataIdx};
    switch dataName
 
-      case 'tomicBays'
+      case 'tomicBaysPerception'
          dataDir = 'data/';
-         dataName = 'tomicBaysSimilarity';
-         load([dataDir dataName], 'ds');
+         dataName = 'tomicBays';
+         load([dataDir dataName], 'dp');
 
-         a = ds.aIdx;
-         b = ds.bIdx;
-         c = ds.cIdx;
-         d = ds.dIdx;
-         y = ds.response;
-         nTrials = ds.nTrials;
-         nStimuli = ds.nStimuli;
+         y = dp.response;
+         s = dp.sIdx;
+         nTrials = dp.nTrials;
+         nStimuli = dp.nStimuli;
    end
 
    %% sampling from graphical model
@@ -48,36 +46,16 @@ for dataIdx = 1:numel(dataList)
    
    % assign MATLAB variables to the observed nodes
    data = struct(...
-      'a'        , a        , ...
-      'b'        , b        , ...
-      'c'        , c        , ...
-      'd'        , d        , ...
-      'y'        , y        , ...
-      'nStimuli' , nStimuli , ...
-      'nTrials'  , nTrials  );
-
-   % censoring initial values so data have likelihood on first sample
-   for t = 1:nTrials
-      if y(t) == 0
-         xAinit(t) = 0.6; xBinit(t) = 0.7;
-         xCinit(t) = 0.6; xDinit(t) = 0.8;
-      else
-         xAinit(t) = 0.6; xBinit(t) = 0.8;
-         xCinit(t) = 0.6; xDinit(t) = 0.7;
-      end
-   end
+      's'  , s      , ...
+      'y'   , y   , ...
+      'nStimuli', nStimuli, ...
+      'nTrials', nTrials);
 
    % generator for initialization
-   % (note intialization of mu, which encourages the 
-   % better log-likelihood representation)
-   generator = @()struct(...
-      'xA', xAinit, ...
-      'xB', xBinit, ...
-      'xC', xCinit, ...
-      'xD', xDinit, ...
-      'mu', ds.stimuli);
+   generator = @()struct('sigma', rand*pi);
 
    fileName = sprintf('%s_%s_%s.mat', modelName, dataName, engine);
+
    if preLoad && isfile(sprintf('storage/%s', fileName))
       fprintf('Loading pre-stored samples for model %s on data %s\n', modelName, dataName);
       load(sprintf('storage/%s', fileName), 'chains', 'stats', 'diagnostics', 'info');
@@ -100,7 +78,7 @@ for dataIdx = 1:numel(dataList)
          'workingdir'      , sprintf('/tmp/%s', modelName)              , ...
          'verbosity'       , 0                                         , ...
          'saveoutput'      , true                                      , ...
-         'modules'         , {}                                , ...
+         'allowunderscores', 1                                         , ...
          'parallel'        , doParallel                                );
       fprintf('%s took %f seconds!\n', upper(engine), toc); % show timing
 
@@ -119,11 +97,4 @@ for dataIdx = 1:numel(dataList)
       save(sprintf('storage/%s', fileName), 'chains', 'stats', 'diagnostics', 'info', '-v7.3');
 
    end
-
-   % log likelihood
-   if contains(params, 'yp')
-      LL = sum(y.*log(yp)) + sum((1-y).*log(1-yp));
-      fprintf('Log-likelihood = %1.4f\n', LL);
-   end
-
 end

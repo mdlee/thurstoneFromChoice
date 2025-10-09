@@ -30,12 +30,12 @@ Inferences about the generated data are then made using `thurstoneFromChoice_4x_
 
 Version 5 assumes all the orientation stimuli lie on a circle, but the circle does not wrap around
 
-`thurstoneFromChoice_4.m` allows data sets (`whoIsSimilar_A`, `whoIsSimilar_B`, ...) to be generated with various task properties
+`thurstoneFromChoice_5.m` allows data sets (`whoIsSimilar_A`, `whoIsSimilar_B`, ...) to be generated with various task properties
 -number of stimuli
 -true orientations
 -number of trials in the experiment
 
-`thurstoneFromChoice_4.m` aslo allows infererences about the `tomicBays` empirical data set from [here](https://psycnet.apa.org/record/2023-21056-001)
+`thurstoneFromChoice_4.m` also allows infererences about the `tomicBays` empirical data set from [here](https://psycnet.apa.org/record/2023-21056-001)
 
 Inferences about the generated data are then made using `thurstoneFromChoice_5x_jags.txt` graphical models, where x allows for model variants
 - `5b` introduces identifiability constraints
