@@ -7,6 +7,7 @@ preLoad = true;
 modelDir = './';
 modelName = 'similarityComparison';
 engine = 'jags';
+CI = [2.5 97.5];
 
 % data sets
 dataList = {...
@@ -127,11 +128,15 @@ for dataIdx = 1:numel(dataList)
 
    end
 
-
    % log likelihood
    if contains(params, 'yp')
       LL = sum(y.*log(yp)) + sum((1-y).*log(1-yp));
       fprintf('Log-likelihood = %1.4f\n', LL);
    end
+
+   % posterior summary sigma
+   sigma = codatable(chains, 'sigma', @mean);
+bounds = prctile(chains.sigma(:), CI);
+fprintf('Posterior mean of sigma is %1.3f, with 95%% CI (%1.3f, %1.3f)\n', sigma, bounds);
 
 end
