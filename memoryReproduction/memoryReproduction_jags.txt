@@ -1,0 +1,26 @@
+# memory reproduction model
+data{
+  pi = 3.1415
+}
+model{
+  # identifiability priors
+  mu[1] = 0
+  mu[2] ~ dunif(0, pi/2)
+  for (j in 3:nStimuli){
+    mu[j] ~ dunif(0, pi)
+  } 
+  # memory noise
+  sigma[1] ~ dunif(0, pi)
+  sigma[2] ~ dunif(0, pi)
+  # swap error probabilities
+  omega3 ~ ddirch(rep(1, 3))
+  omega6 ~ ddirch(rep(1, 6))
+  # experimental trials
+  for (t in 1:nTrials){
+    # stimulus being targeted
+    xi[t, 1] ~ dcat(omega3)
+    xi[t, 2] ~ dcat(omega6)
+    # response
+    y[t] ~ dnorm(mu[stim[t, xi[t, setSize[t]]]], 1/sigma[setSize[t]]^2)
+  }
+} 
