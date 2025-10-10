@@ -8,6 +8,7 @@ modelDir = './';
 modelName = 'perceptualReproduction';
 engine = 'jags';
 % engine = 'stan';
+CI = [2.5 97.5];
 
 % data sets
 dataList = {...
@@ -97,4 +98,10 @@ for dataIdx = 1:numel(dataList)
       save(sprintf('storage/%s', fileName), 'chains', 'stats', 'diagnostics', 'info', '-v7.3');
 
    end
+
+      % posterior summary sigma
+   sigma = codatable(chains, 'sigma', @mean);
+   bounds = prctile(chains.sigma(:), CI);
+   fprintf('Posterior mean of sigma is %1.3f, with 95%% CI (%1.3f, %1.3f)\n', sigma, bounds);
+
 end

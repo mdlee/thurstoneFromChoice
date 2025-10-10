@@ -1,13 +1,14 @@
-%% Perceptual reproduction model
+%% Memory reproduction model without swap process
 
 clear; close all;
-preLoad = true;
+preLoad = false;
 
 % graphical model script
 modelDir = './';
 modelName = 'memoryReproductionNoSwap';
 engine = 'jags';
-% engine = 'stan';
+engine = 'stan';
+CI = [2.5 97.5];
 
 % data sets
 dataList = {...
@@ -99,4 +100,13 @@ for dataIdx = 1:numel(dataList)
       save(sprintf('storage/%s', fileName), 'chains', 'stats', 'diagnostics', 'info', '-v7.3');
 
    end
+
+   % posterior summary for sigmas
+   sigma3 = codatable(chains, 'sigma_1', @mean);
+   bounds3 = prctile(chains.sigma_1(:), CI);
+   fprintf('Posterior mean of sigma for set size 3 is %1.3f, with 95%% CI (%1.3f, %1.3f)\n', sigma3, bounds3);
+   sigma6 = codatable(chains, 'sigma_2', @mean);
+   bounds6 = prctile(chains.sigma_2(:), CI);
+   fprintf('Posterior mean of sigma for set size 6 is %1.3f, with 95%% CI (%1.3f, %1.3f)\n', sigma6, bounds6);
+
 end

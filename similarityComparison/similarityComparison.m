@@ -136,7 +136,7 @@ for dataIdx = 1:numel(dataList)
 
    % posterior summary sigma
    sigma = codatable(chains, 'sigma', @mean);
-bounds = prctile(chains.sigma(:), CI);
-fprintf('Posterior mean of sigma is %1.3f, with 95%% CI (%1.3f, %1.3f)\n', sigma, bounds);
+   bounds = prctile(chains.sigma(:), CI);
+   fprintf('Posterior mean of sigma is %1.3f, with 95%% CI (%1.3f, %1.3f)\n', sigma, bounds);
 
 end
