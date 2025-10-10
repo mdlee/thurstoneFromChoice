@@ -1,4 +1,4 @@
-# Perceptual reproduction model
+### Perceptual reproduction model
 
 On each trial an oriented line stimulus is presented and the participant uses an interface to reproduce it.
 

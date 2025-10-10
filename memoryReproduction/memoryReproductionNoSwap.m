@@ -1,13 +1,13 @@
 %% Memory reproduction model without swap process
 
 clear; close all;
-preLoad = false;
+preLoad = true;
 
 % graphical model script
 modelDir = './';
 modelName = 'memoryReproductionNoSwap';
 engine = 'jags';
-engine = 'stan';
+%engine = 'stan';
 CI = [2.5 97.5];
 
 % data sets

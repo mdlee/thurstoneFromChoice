@@ -1,7 +1,7 @@
 %% Memory reproduction model with swap process
 
 clear; close all;
-preLoad = false;
+preLoad = true;
 
 % graphical model script
 modelDir = './';
